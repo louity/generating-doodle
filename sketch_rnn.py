@@ -77,7 +77,7 @@ class DataLoader():
         self.path_data = path_data
         self.data = dataset['train']
         self.valid_set = dataset['valid']
-        self.test_set = dataset['test'] # TODO: unused for now
+        self.test_set = dataset['test']  # TODO: unused for now
         # preprocess the data
         self.data = purify(self.data, hp)
         self.data = normalize_strokes(self.data)
@@ -110,7 +110,10 @@ class DataLoader():
     # TODO: something that read directly an input Image and process
     # it for the network.
 
-    def select_batch(self, l_idx_datum, use_cuda, type_set='train'):
+    def select_batch(self,
+                     l_idx_datum,
+                     use_cuda,
+                     type_set='train'):
         # selecting specific idx
         # check that idx are valid
         if not all(i >= 0 for i in l_idx_datum):
@@ -129,6 +132,23 @@ class DataLoader():
         return(make_batch_point(batch_sequences,
                                 self.max_len_out,
                                 use_cuda))
+
+    def plot_image(self, idx, plot=True):
+        off_seq = self.data[idx]
+
+        def make_seq(seq_x, seq_y, seq_z):
+            # transform the lists in the right array
+            x_sample = np.cumsum(seq_x, 0)
+            y_sample = np.cumsum(seq_y, 0)
+            z_sample = np.array(seq_z)
+            sequence_coo = np.stack([x_sample, y_sample, z_sample]).T
+            sequence_offset = np.stack([np.array(seq_x),
+                                       np.array(seq_y), np.array(z_sample)]).T
+            return(sequence_coo, sequence_offset)
+        seq, _ = make_seq(off_seq[:, 0], off_seq[:, 1], off_seq[:, 2])
+        # TODO: still not sure of what is off_seq
+        make_image(seq, 42, dest_folder=None,
+                   name='_output_', plot=plot)
 
     def initialize(self,
                    parametrization,
@@ -378,7 +398,7 @@ class Model():
                                      uncondition=False,
                                      plot=False,
                                      sigma=1,
-                                     nbr_image=10):
+                                     idx_image=11):
         '''
         uncondition : If True, then it decodes an image starting from
         a random image. If False, it select a random image, encode it and then
@@ -408,7 +428,8 @@ class Model():
             if not hasattr(self, 'dataloader'):
                 raise ValueError('To have the latent image of an image, you need \
                                  the dataloader for that image.')
-            batch, lengths = self.dataloader.make_batch(1, use_cuda)
+            batch, lengths = self.dataloader.select_batch([idx_image],
+                                                          use_cuda)
             z, _, _ = self.encoder(batch, 1)
 
         if use_cuda:
