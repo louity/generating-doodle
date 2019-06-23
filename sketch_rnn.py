@@ -152,7 +152,7 @@ class DataLoader():
         return(sos)
 
 
-def lr_decay(optimizer):
+def lr_decay(optimizer, hp):
     """Decay learning rate by a factor of lr_decay"""
     for param_group in optimizer.param_groups:
         if param_group['lr'] > hp.min_lr:
@@ -270,8 +270,10 @@ class Model():
             # before the lr_decay was every epoch
             print('epoch', epoch, 'loss', loss.item(), 'LR',
                   LR.item(), 'LKL', LKL.item())
-            self.encoder_optimizer = lr_decay(self.encoder_optimizer)
-            self.decoder_optimizer = lr_decay(self.decoder_optimizer)
+            self.encoder_optimizer = lr_decay(self.encoder_optimizer,
+                                              self.hyper_params)
+            self.decoder_optimizer = lr_decay(self.decoder_optimizer,
+                                              self.hyper_params)
         if epoch % self.size_checkpoint == 0 and epoch != 0:
             self.save(epoch)
             # Beware here I added the .item()
@@ -375,11 +377,19 @@ class Model():
     def conditional_generation_point(self, epoch,
                                      uncondition=False,
                                      plot=False,
-                                     sigma=1):
+                                     sigma=1,
+                                     nbr_image=10):
         '''
         uncondition : If True, then it decodes an image starting from
         a random image. If False, it select a random image, encode it and then
         decode a new image with the latent vector coming from it.
+
+        Input:
+        ------
+            - nbr_image : index of the image which condition the generation
+            if uncondition is False.
+            - sigma : variance of the Gaussian Vector if generating from a
+            random gaussian vector (if uncondition is True)
         '''
         # should remove dropouts:
         self.encoder.train(False)
@@ -388,8 +398,12 @@ class Model():
         if uncondition:
             # z is just a random normal of size Nz?
             # TODO: I changed this hp.Nz
-            z = torch.from_numpy(np.random.normal(0, sigma, self.hyper_params.Nz))\
-                .type('torch.FloatTensor').view(-1, self.hyper_params.Nz).cuda()
+            if use_cuda:
+                z = torch.from_numpy(np.random.normal(0, sigma, self.hyper_params.Nz))\
+                    .type('torch.FloatTensor').view(-1, self.hyper_params.Nz).cuda()
+            else:
+                z = torch.from_numpy(np.random.normal(0, sigma, self.hyper_params.Nz))\
+                    .type('torch.FloatTensor').view(-1, self.hyper_params.Nz)
         else:
             if not hasattr(self, 'dataloader'):
                 raise ValueError('To have the latent image of an image, you need \
@@ -407,7 +421,10 @@ class Model():
         seq_z = []
         hidden_cell = None
         for i in range(self.hyper_params.max_len_out):
-            input = torch.cat([s, z.unsqueeze(0).cuda()], 2)
+            if use_cuda:
+                input = torch.cat([s, z.unsqueeze(0).cuda()], 2)
+            else:
+                input = torch.cat([s, z.unsqueeze(0)], 2)
             # decode:
             self.pi, self.mu_x, self.mu_y, self.sigma_x, self.sigma_y, \
                 self.rho_xy, self.q, hidden, cell = \
