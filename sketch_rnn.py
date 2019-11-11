@@ -7,14 +7,14 @@ import pickle
 import torch
 from torch import optim, nn
 
-from sketchrnn.batchutils import make_batch_point, make_batch_line
-from sketchrnn.batchutils import make_target_point, make_target_line
-from sketchrnn.loss import reconstruction_loss, kullback_leibler_loss
-from sketchrnn.models import EncoderRNN, DecoderRNN
-from sketchrnn.models_line import EncoderRNN_line, DecoderRNN_line
-from sketchrnn.sampleutils import sample_bivariate_normal, sample_univariate_normal
-from sketchrnn.visutils import make_image, make_image_seq, plot_sketch
-from sketchrnn.dataset.datautils import purify, normalize_strokes
+from utils.batchutils import make_batch_point, make_batch_line
+from utils.batchutils import make_target_point, make_target_line
+from utils.loss import reconstruction_loss, kullback_leibler_loss
+from utils.models import EncoderRNN, DecoderRNN
+# from utils.models_line import EncoderRNN_line, DecoderRNN_line
+from utils.sampleutils import sample_bivariate_normal, sample_univariate_normal
+from utils.visutils import make_image, make_image_seq, plot_sketch
+from utils.dataset.datautils import purify, normalize_strokes
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Sketch-RNN training Training')

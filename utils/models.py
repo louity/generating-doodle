@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from sketchrnn.modelsutils import get_distr_param
+from utils.modelsutils import get_distr_param
 
 
 class EncoderRNN(nn.Module):

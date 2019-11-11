@@ -5,7 +5,7 @@ from matplotlib import collections as mc
 import numpy as np
 import PIL
 
-from sketchrnn.paramutils import seg_to_point
+from utils.paramutils import seg_to_point
 
 
 def make_image(sequence, dest_folder=None,

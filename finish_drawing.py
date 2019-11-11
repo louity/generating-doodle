@@ -5,11 +5,11 @@ import re
 import numpy as np
 import torch
 
-from sketch_rnn import HParams
-from sketch_rnn import Model
-from sketch_rnn import DataLoader
-from sketchrnn.visutils import make_image
-from sketchrnn.batchutils import make_image_point
+from utils import HParams
+from utils import Model
+from utils import DataLoader
+from utils.visutils import make_image
+from utils.batchutils import make_image_point
 '''
 Run python finish_drawing.py --experiment uncondition --sigma 0.01
 to see ouput of unconditionned generation with a given value of sigma.

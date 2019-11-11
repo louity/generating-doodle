@@ -5,8 +5,8 @@ import numpy as np
 import pickle
 import torch
 
-from sketch_rnn import Model, DataLoader
-from sketch_rnn import HParams
+from utils import Model, DataLoader
+from utils import HParams
 
 
 def try_training(use_cuda):
