@@ -1,17 +1,19 @@
 '''
-File testing all functionalities
+File quickly testing the functionalities on a particular model.
 '''
-import numpy as np
-import pickle
 import torch
 
-from utils import Model, DataLoader
-from utils import HParams
+from sketch_rnn import Model, DataLoader
+from sketch_rnn import HParams
 
+if torch.cuda.is_available() == True:
+    device = 'cuda'
+    use_cuda = True
+else:
+    device = 'cpu'
+    use_cuda = False
 
 def try_training(use_cuda):
-    '''
-    '''
     hp = HParams()
     hp.use_cuda = use_cuda
     dataloader = DataLoader('data/cat.npz', hp)
@@ -24,7 +26,9 @@ def try_training(use_cuda):
     print('taining with cuda = {} works'.format(use_cuda))
 
 
-def try_generating(use_cuda, sigma,
+def try_generating(sigma,
+                   encoder_name,
+                   decoder_name,
                    uncondition=False,
                    idx_image=10):
     '''
@@ -41,9 +45,6 @@ def try_generating(use_cuda, sigma,
     dataloader = DataLoader('data/cat.npz', hp)
     # load model
     model = Model(hyper_parameters=hp, parametrization='point')
-    encoder_name = 'draw_models/encoder_cat_20000.pth'
-    decoder_name = 'draw_models/decoder_cat_20000.pth'
-
     model.load(encoder_name, decoder_name)
     if not uncondition:
         print('printing image we will regenerate')
@@ -57,17 +58,19 @@ def try_generating(use_cuda, sigma,
 
 
 def try_completing(use_cuda, sigma):
+    # TODO
     return()
 
 
-if __name__ == '__main__':
-    try_training(False)
-    try_generating(False, 0.01, uncondition=False)
-    try_generating(False, 0.1, uncondition=True)
-    if torch.cuda.is_available():
-        try_training(True)
-        try_completing(True, 0.01)
-    else:
-        print('could not try with cuda because not available')
-    # check that there exists cuda
-    # try_training(True)
+if __name__ == '__main__': 
+    encoder_name = 'draw_models/encoder_broccoli_car_cat_7000.pth'
+    decoder_name = 'draw_models/decoder_broccoli_car_cat_7000.pth'
+    try_generating(0.01,
+                   encoder_name,
+                   decoder_name,
+                   uncondition=False)
+    try_generating(0.1,
+                   encoder_name,
+                   decoder_name,
+                   uncondition=True)
+

@@ -12,7 +12,7 @@ class EncoderRNN(nn.Module):
         self.hyper_params = hp
         # bidirectional lstm:
         # TODO: change LSTM(hp.size_paramatrization)
-        self.lstm = nn.LSTM(self.hyper_params.size_paramatrization,
+        self.lstm = nn.LSTM(self.hyper_params.size_parametrization,
                             self.hyper_params.enc_hidden_size,
                             bidirectional=True)
         self.dropout = nn.Dropout(self.hyper_params.dropout)

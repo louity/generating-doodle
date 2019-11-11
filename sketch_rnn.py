@@ -73,7 +73,10 @@ class DataLoader():
         hp : an instance of HParams
         '''
         # dataset = np.load(args.train_data, encoding='latin1')
-        dataset = np.load(path_data, encoding='latin1')
+        dataset = np.load(path_data,
+                          encoding='latin1',
+                          allow_pickle=True,)
+        # TODO: beware on the allow pickle
         self.path_data = path_data
         self.data = dataset['train']
         self.valid_set = dataset['valid']
@@ -186,7 +189,8 @@ class Model():
         self.parametrization = parametrization
         self.hyper_params = hyper_parameters
         if self.parametrization == 'point':
-            self.hyper_params.size_paramatrization = 5
+            self.hyper_params.size_parametrization = 5
+            # TODO: add to the case of any parametrization
             self.encoder = EncoderRNN(self.hyper_params)
             self.decoder = DecoderRNN(self.hyper_params,
                                       max_len_out=self.hyper_params.max_len_out)
