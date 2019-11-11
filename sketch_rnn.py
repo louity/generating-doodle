@@ -147,7 +147,7 @@ class DataLoader():
             return(sequence_coo, sequence_offset)
         seq, _ = make_seq(off_seq[:, 0], off_seq[:, 1], off_seq[:, 2])
         # TODO: still not sure of what is off_seq
-        make_image(seq, 42, dest_folder=None,
+        make_image(seq, dest_folder=None,
                    name='_output_', plot=plot)
 
     def initialize(self,
@@ -186,6 +186,7 @@ class Model():
         self.parametrization = parametrization
         self.hyper_params = hyper_parameters
         if self.parametrization == 'point':
+            self.hyper_params.size_paramatrization = 5
             self.encoder = EncoderRNN(self.hyper_params)
             self.decoder = DecoderRNN(self.hyper_params,
                                       max_len_out=self.hyper_params.max_len_out)
@@ -215,8 +216,6 @@ class Model():
         self.decoder.train()
 
         # prepare batch
-        # TODO: these three are global variable...
-        # TODO: replace hyper_params by hp to be consistent all along?
         batch, lengths = dataloader.make_batch(self.hyper_params.batch_size,
                                                use_cuda,
                                                parametrization=self.parametrization)
@@ -224,6 +223,7 @@ class Model():
         z, self.mu, self.sigma = self.encoder(batch,
                                               self.hyper_params.batch_size)
         # TODO: replace by 'point' by self.parametrisation
+        # self.parametrization devrait etre dans dataloader???
         sos = dataloader.initialize('point',
                                     use_cuda,
                                     self.hyper_params.batch_size)
@@ -300,9 +300,9 @@ class Model():
             self.loss_train.append(loss.item())
             self.loss_valid.append(self.compute_loss_valid().item())
             if self.parametrization == 'point':
-                self.conditional_generation_point(epoch)
+                self.conditional_generation_point()
             elif self.parametrization == 'line':
-                self.conditional_generation_line(epoch)
+                self.conditional_generation_line()
 
     def compute_loss_valid(self) -> None:
         '''compute loss of validation set'''
@@ -394,7 +394,7 @@ class Model():
         self.encoder.load_state_dict(saved_encoder)
         self.decoder.load_state_dict(saved_decoder)
 
-    def conditional_generation_point(self, epoch,
+    def conditional_generation_point(self,
                                      uncondition=False,
                                      plot=False,
                                      sigma=1,
@@ -465,7 +465,7 @@ class Model():
         y_sample = np.cumsum(seq_y, 0)
         z_sample = np.array(seq_z)
         sequence = np.stack([x_sample, y_sample, z_sample]).T
-        make_image(sequence, epoch,
+        make_image(sequence,
                    dest_folder='images/train_point',
                    plot=plot)
 

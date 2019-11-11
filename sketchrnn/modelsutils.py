@@ -36,7 +36,8 @@ def get_distr_param(y, len_out, hp, type_param='point'):
         params_mixture = torch.stack(params[:-1])
         params_pen = params[-1]
         pi, mu_x, mu_y, sigma_x, sigma_y, rho_xy = torch.split(params_mixture, 1, dim=2)
-        pi = F.softmax(pi.transpose(0, 1).squeeze()).view(len_out, -1, hp.M)
+        dim_soft_pi = pi.transpose(0, 1).squeeze().shape.index(hp.M)
+        pi = F.softmax(pi.transpose(0, 1).squeeze(), dim=dim_soft_pi).view(len_out, -1, hp.M)
         sigma_x = torch.exp(sigma_x.transpose(0, 1).squeeze()).view(len_out, -1, hp.M)
         sigma_y = torch.exp(sigma_y.transpose(0, 1).squeeze()).view(len_out, -1, hp.M)
         rho_xy = torch.tanh(rho_xy.transpose(0, 1).squeeze()).view(len_out, -1, hp.M)
@@ -69,20 +70,24 @@ def get_distr_param(y, len_out, hp, type_param='point'):
         OK we don't want to replace -1 by batch_size, because it is an
         argument that is not given and hence when the batch_size equals 1 we are in the cheat.
         '''
-
-        pi = F.softmax(pi.transpose(0, 1).squeeze()).view(len_out, -1, hp.M)
+        dim_soft_pi = pi.transpose(0, 1).squeeze().shape.index(hp.M)
+        pi = F.softmax(pi.transpose(0, 1).squeeze(), dim=dim_soft_pi).view(len_out, -1, hp.M)
         sigma_x = torch.exp(sigma_x.transpose(0, 1).squeeze()).view(len_out, -1, hp.M)
         sigma_y = torch.exp(sigma_y.transpose(0, 1).squeeze()).view(len_out, -1, hp.M)
         rho_xy = torch.tanh(rho_xy.transpose(0, 1).squeeze()).view(len_out, -1, hp.M)
         mu_x = mu_x.transpose(0, 1).squeeze().contiguous().view(len_out, -1, hp.M)
         mu_y = mu_y.transpose(0, 1).squeeze().contiguous().view(len_out, -1, hp.M)
 
-        pi_r = F.softmax(pi_r.transpose(0, 1).squeeze()).view(len_out, -1, hp.Mr)
+        dim_soft_pi_r = pi.transpose(0, 1).squeeze().shape.index(hp.Mr)
+        pi_r = F.softmax(pi_r.transpose(0, 1).squeeze(),
+                         dim=dim_soft_pi_r).view(len_out, -1, hp.Mr)
         sigma_r = torch.exp(sigma_r.transpose(0, 1).squeeze()).view(len_out, -1, hp.Mr)
         # TODO: mu_r could be exp(..) to ensure that it is strictly positive...
         mu_r = mu_r.transpose(0, 1).squeeze().contiguous().view(len_out, -1, hp.Mr)
 
-        pi_phi = F.softmax(pi_phi.transpose(0, 1).squeeze()).view(len_out, -1, hp.Mphi)
+        dim_soft_phi = pi_phi.transpose(0, 1).squeeze().shape.index(hp.Mphi)
+        pi_phi = F.softmax(pi_phi.transpose(0, 1).squeeze(),
+                           dim=dim_soft_phi).view(len_out, -1, hp.Mphi)
         sigma_phi = torch.exp(sigma_phi.transpose(0, 1).squeeze()).view(len_out, -1, hp.Mphi)
         mu_phi = mu_phi.transpose(0, 1).squeeze().contiguous().view(len_out, -1, hp.Mphi)
 

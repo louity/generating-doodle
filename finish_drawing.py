@@ -13,8 +13,8 @@ from sketchrnn.batchutils import make_image_point
 '''
 Run python finish_drawing.py --experiment uncondition --sigma 0.01
 to see ouput of unconditionned generation with a given value of sigma.
-uncondition means that we simply pick a random gaussian vector and feed it to the 
-decoder without any latent-vector z representing an image. 
+uncondition means that we simply pick a random gaussian vector and feed it to the
+decoder without any latent-vector z representing an image.
 '''
 
 use_cuda = torch.cuda.is_available()
@@ -66,7 +66,7 @@ if args_draw.experiment not in ['uncondition', 'complete']:
     raise ValueError('experiment should either be uncondition or complete')
 
 if args_draw.experiment == 'uncondition':
-    model.conditional_generation_point(10, uncondition=True, plot=True,
+    model.conditional_generation_point(uncondition=True, plot=True,
                                        sigma=float(args_draw.sigma))
     # 10 is arbitrary.
 elif args_draw.experiment == 'complete':

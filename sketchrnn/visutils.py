@@ -8,7 +8,7 @@ import PIL
 from sketchrnn.paramutils import seg_to_point
 
 
-def make_image(sequence, epoch, dest_folder=None,
+def make_image(sequence, dest_folder=None,
                name='_output_', plot=False) -> None:
     """
     plot drawing with separated strokes. Sequence represents already the
@@ -23,7 +23,7 @@ def make_image(sequence, epoch, dest_folder=None,
     canvas.draw()
     pil_image = PIL.Image.frombytes('RGB', canvas.get_width_height(),
                                     canvas.tostring_rgb())
-    name = '{}_{}.jpg'.format(epoch, name)
+    name = '{}.jpg'.format(name)
     if dest_folder is not None:
         os.makedirs(dest_folder, exist_ok=True)
         name = os.path.join(dest_folder, name)
@@ -34,7 +34,7 @@ def make_image(sequence, epoch, dest_folder=None,
         plt.close("all")
 
 
-def make_image_seq(sequence, epoch, dest_folder='images/train_line') -> None:
+def make_image_seq(sequence, dest_folder='images/train_line') -> None:
     if np.shape(sequence)[1] != 4:
         raise ValueError('we expect an image parametrized as a list of segment')
     lines = []
@@ -49,7 +49,7 @@ def make_image_seq(sequence, epoch, dest_folder='images/train_line') -> None:
     ax.autoscale()
     ax.margins(0.1)
     # saving it
-    name = dest_folder + '\output_{}.jpg'.format(epoch)
+    name = dest_folder + '\output.jpg'
     plt.savefig(name)
 
 

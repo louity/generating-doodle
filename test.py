@@ -50,8 +50,7 @@ def try_generating(use_cuda, sigma,
         dataloader.plot_image(idx_image, plot=True)
     print('printing generated image')
     model.dataloader = dataloader
-    model.conditional_generation_point(10,
-                                       uncondition=uncondition,
+    model.conditional_generation_point(uncondition=uncondition,
                                        plot=True,
                                        sigma=sigma)
     print('done generating from initial image with sigma = {}'.format(sigma))
